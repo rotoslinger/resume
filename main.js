@@ -33,7 +33,7 @@ audioLoader.load(
     sound.setBuffer(buffer);
     // Set other properties
     sound.setLoop(true); // Loop the audio
-    sound.setVolume(0.5); // Set the volume (0.0 to 1.0)
+    sound.setVolume(0.0); // Start at 0 for fade-in
     console.log('Audio loaded and ready to play');
   },
   undefined, // Optional: onProgress callback
@@ -89,12 +89,6 @@ controls.maxPolarAngle = Math.PI;
 // Load the GLB model
 const loader = new GLTFLoader();
 let character = null;
-let headBone = null;
-let neckBone = null;
-let headRotationOffset = 0;
-let neckRotationOffset = 0;
-let originalHeadRotationX = 0;
-let originalNeckRotationX = 0;
 
 console.log('Starting GLB load...');
 
@@ -120,54 +114,6 @@ try {
   console.log('Character scene:', character);
   console.log('Character children:', character.children);
   
-              // Check for bones/skeleton and find head/neck bones
-              console.log('=== BONE DETECTION START ===');
-              character.traverse((child) => {
-                if (child.isMesh) {
-                  console.log('Found mesh:', child.name, child.geometry);
-                  if (child.skeleton) {
-                    console.log('Mesh has skeleton with', child.skeleton.bones.length, 'bones');
-                    
-                    // List ALL bones to see what's available
-                    child.skeleton.bones.forEach((bone, index) => {
-                      console.log(`Bone ${index}: "${bone.name}"`);
-                    });
-                    
-                    // Find head and neck bones - try different variations
-                    child.skeleton.bones.forEach(bone => {
-                      const boneNameLower = bone.name.toLowerCase();
-                      if (boneNameLower.includes('head') || boneNameLower.includes('skull') || boneNameLower.includes('cranium')) {
-                        headBone = bone;
-                        originalHeadRotationX = bone.rotation.x;
-                        console.log('✅ Found head bone:', bone.name, 'Original X rotation:', originalHeadRotationX);
-                      }
-                      if (boneNameLower.includes('neck') || boneNameLower.includes('cervical') || boneNameLower.includes('spine1') || boneNameLower.includes('spine_1')) {
-                        neckBone = bone;
-                        originalNeckRotationX = bone.rotation.x;
-                        console.log('✅ Found neck bone:', bone.name, 'Original X rotation:', originalNeckRotationX);
-                      }
-                    });
-                  }
-                }
-                if (child.isBone) {
-                  console.log('Found direct bone:', child.name, child.position);
-                  // Also check direct bone children
-                  const boneNameLower = child.name.toLowerCase();
-                  if (boneNameLower.includes('head') || boneNameLower.includes('skull') || boneNameLower.includes('cranium')) {
-                    headBone = child;
-                    originalHeadRotationX = child.rotation.x;
-                    console.log('✅ Found head bone (direct):', child.name, 'Original X rotation:', originalHeadRotationX);
-                  }
-                  if (boneNameLower.includes('neck') || boneNameLower.includes('cervical') || boneNameLower.includes('spine1') || boneNameLower.includes('spine_1')) {
-                    neckBone = child;
-                    originalNeckRotationX = child.rotation.x;
-                    console.log('✅ Found neck bone (direct):', child.name, 'Original X rotation:', originalNeckRotationX);
-                  }
-                }
-              });
-              console.log('=== BONE DETECTION END ===');
-              console.log('Head bone found:', !!headBone);
-              console.log('Neck bone found:', !!neckBone);
   
   // Calculate the bounding box of the character
   const box = new THREE.Box3().setFromObject(character);
@@ -211,40 +157,6 @@ try {
               baseAction.play();
               console.log('Playing base animation:', gltf.animations[0].name);
 
-              // Create additive animations for head and neck rotation
-              if (headBone) {
-                // Create a simple additive clip for head rotation
-                const headClip = new THREE.AnimationClip('headRotation', -1, [
-                  new THREE.NumberKeyframeTrack(
-                    headBone.name + '.rotation[x]',
-                    [0, 1],
-                    [0, 0]
-                  )
-                ]);
-                THREE.AnimationUtils.makeClipAdditive(headClip);
-                const headAction = mixer.clipAction(headClip);
-                headAction.weight = 0;
-                headAction.play();
-                character.headAction = headAction;
-                console.log('Created head additive action for bone:', headBone.name);
-              }
-
-              if (neckBone) {
-                // Create a simple additive clip for neck rotation
-                const neckClip = new THREE.AnimationClip('neckRotation', -1, [
-                  new THREE.NumberKeyframeTrack(
-                    neckBone.name + '.rotation[x]',
-                    [0, 1],
-                    [0, 0]
-                  )
-                ]);
-                THREE.AnimationUtils.makeClipAdditive(neckClip);
-                const neckAction = mixer.clipAction(neckClip);
-                neckAction.weight = 0;
-                neckAction.play();
-                character.neckAction = neckAction;
-                console.log('Created neck additive action for bone:', neckBone.name);
-              }
 
               // Store mixer for animation loop
               character.mixer = mixer;
@@ -375,23 +287,6 @@ function animate() {
                 }
               }
               
-              // Apply additive animation weights based on slider values
-              if (character.headAction) {
-                character.headAction.weight = Math.abs(headRotationOffset) / 1.57; // Normalize to 0-1
-                // Update the keyframe track with the slider value
-                const track = character.headAction.getClip().tracks[0];
-                if (track) {
-                  track.values[1] = headRotationOffset;
-                }
-              }
-              if (character.neckAction) {
-                character.neckAction.weight = Math.abs(neckRotationOffset) / 1.57; // Normalize to 0-1
-                // Update the keyframe track with the slider value
-                const track = character.neckAction.getClip().tracks[0];
-                if (track) {
-                  track.values[1] = neckRotationOffset;
-                }
-              }
   
   composer.render();
 }
@@ -605,37 +500,73 @@ window.addEventListener('resize', () => {
 // Start animation
 animate();
 
-// Play audio on button click - wait for DOM to be ready
-document.addEventListener('DOMContentLoaded', function() {
-  const playBtn = document.getElementById('play-audio-btn');
-  console.log('Button found:', !!playBtn);
+// Auto-play audio on any user interaction
+let audioStarted = false;
+
+function startAudio() {
+  console.log('startAudio called, audioStarted:', audioStarted);
+  if (audioStarted) return;
+  audioStarted = true;
+
+  console.log('User interaction detected, starting audio...');
+  console.log('AudioContext state:', listener.context.state);
+  console.log('Sound buffer:', sound.buffer);
   
-  if (playBtn) {
-    playBtn.addEventListener('click', function() {
-      console.log('BUTTON CLICKED!');
-      console.log('Sound object:', sound);
-      console.log('Sound buffer:', sound.buffer);
-      console.log('Sound isPlaying:', sound.isPlaying);
-      
-      if (sound.isPlaying) {
-        console.log('Stopping audio...');
-        sound.stop(); // Stop if already playing
-        this.textContent = '🎵 Play Audio';
-      } else {
-        console.log('Playing audio...');
-        try {
-          sound.play(); // Play if not playing
-          this.textContent = '⏸️ Stop Audio';
-          console.log('Audio play() called successfully');
-        } catch (error) {
-          console.error('Error playing audio:', error);
-        }
-      }
+  // Resume AudioContext if suspended
+  if (listener.context.state === 'suspended') {
+    console.log('Resuming AudioContext...');
+    listener.context.resume().then(() => {
+      console.log('AudioContext resumed, state:', listener.context.state);
+      playAudio();
     });
   } else {
-    console.error('Play audio button not found!');
+    console.log('AudioContext already active');
+    playAudio();
   }
-});
+}
+
+function playAudio() {
+  console.log('playAudio called');
+  if (!sound.buffer) {
+    console.warn('Audio buffer not yet loaded');
+    return;
+  }
+
+  if (sound.isPlaying) {
+    console.log('Audio already playing');
+    return;
+  }
+
+  console.log('Calling sound.play()...');
+  sound.play();
+  console.log('Audio started successfully');
+
+  // Fade in over 4 seconds to 0.5 volume
+  const fadeDuration = 4000; // 4 seconds
+  const targetVolume = 0.5;
+  const startTime = Date.now();
+
+  function fadeIn() {
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / fadeDuration, 1);
+    const currentVolume = progress * targetVolume;
+    
+    sound.setVolume(currentVolume);
+    
+    if (progress < 1) {
+      requestAnimationFrame(fadeIn);
+    } else {
+      console.log('Audio fade-in complete');
+    }
+  }
+
+  fadeIn();
+}
+
+// Listen for any user interaction
+document.addEventListener('click', startAudio);
+document.addEventListener('keydown', startAudio);
+document.addEventListener('touchstart', startAudio);
 
 // Volume slider control
 document.getElementById('volume-slider').addEventListener('input', (e) => {
@@ -644,20 +575,5 @@ document.getElementById('volume-slider').addEventListener('input', (e) => {
   document.getElementById('volume-value').textContent = value.toFixed(1);
 });
 
-// Head rotation control
-document.getElementById('head-rotation').addEventListener('input', (e) => {
-  const value = parseFloat(e.target.value);
-  headRotationOffset = value;
-  console.log('Head rotation offset set to:', value);
-  document.getElementById('head-rotation-value').textContent = value.toFixed(2);
-});
-
-// Neck rotation control
-document.getElementById('neck-rotation').addEventListener('input', (e) => {
-  const value = parseFloat(e.target.value);
-  neckRotationOffset = value;
-  console.log('Neck rotation offset set to:', value);
-  document.getElementById('neck-rotation-value').textContent = value.toFixed(2);
-});
 
 
