@@ -13,24 +13,22 @@
       <div class="ui-overlay">
         <header class="header">
           <h1></h1>
+          <div class="audio-controls">
+            <button id="play-audio-btn" class="music-note-btn">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17S7.79 21 10 21 14 19.21 14 17V7H18V3H12Z" fill="currentColor"/>
+              </svg>
+              <span class="btn-text">Play</span>
+            </button>
+            <div class="volume-control">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12ZM14 3.23V5.29C16.89 6.15 19 8.83 19 12S16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12S18.01 4.14 14 3.23Z" fill="currentColor"/>
+              </svg>
+              <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">
+              <span id="volume-value">0.5</span>
+            </div>
+          </div>
         </header>
-                    <div class="controls">
-                      <div class="control-group">
-                        <label for="volume-slider">Volume:</label>
-                        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">
-                        <span id="volume-value">0.5</span>
-                      </div>
-          <div class="control-group">
-            <label for="head-rotation">Head Rotation X:</label>
-            <input type="range" id="head-rotation" min="-1.57" max="1.57" step="0.1" value="0">
-            <span id="head-rotation-value">0.0</span>
-          </div>
-          <div class="control-group">
-            <label for="neck-rotation">Neck Rotation X:</label>
-            <input type="range" id="neck-rotation" min="-1.57" max="1.57" step="0.1" value="0">
-            <span id="neck-rotation-value">0.0</span>
-          </div>
-        </div>
         <!-- Material property controls - Commented out
         <div class="controls">
           <div class="control-group">

@@ -563,7 +563,27 @@ function playAudio() {
   fadeIn();
 }
 
-// Listen for any user interaction
+// Button click handler
+const playBtn = document.getElementById('play-audio-btn');
+if (playBtn) {
+  playBtn.addEventListener('click', function() {
+    if (audioStarted) {
+      // Stop audio
+      sound.stop();
+      audioStarted = false;
+      this.classList.remove('playing');
+      this.querySelector('.btn-text').textContent = 'Play';
+      console.log('Audio stopped');
+    } else {
+      // Start audio
+      startAudio();
+      this.classList.add('playing');
+      this.querySelector('.btn-text').textContent = 'Stop';
+    }
+  });
+}
+
+// Listen for any user interaction (fallback)
 document.addEventListener('click', startAudio);
 document.addEventListener('keydown', startAudio);
 document.addEventListener('touchstart', startAudio);
@@ -574,6 +594,7 @@ document.getElementById('volume-slider').addEventListener('input', (e) => {
   sound.setVolume(value);
   document.getElementById('volume-value').textContent = value.toFixed(1);
 });
+
 
 
 
