@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Test</title>
+    <style>
+        body { margin: 0; padding: 0; background: #000; color: #fff; font-family: Arial, sans-serif; }
+        #container { position: relative; width: 100vw; height: 100vh; }
+        canvas { display: block; }
+        #info { position: absolute; top: 10px; left: 10px; z-index: 100; }
+        #controls { position: absolute; bottom: 10px; right: 10px; z-index: 100; }
+        button { padding: 10px 20px; margin: 5px; background: #333; color: #fff; border: 1px solid #666; cursor: pointer; }
+        button:hover { background: #555; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+        <div id="info">
+            <h3>Three.js Test</h3>
+            <div id="status">Loading...</div>
+        </div>
+        <div id="controls">
+            <button id="rotate-btn">Toggle Rotation</button>
+            <button id="color-btn">Change Color</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r158/three.min.js"></script>
+    <script>
+        console.log('Starting Three.js test...');
+        
+        // Scene setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            canvas: document.getElementById('canvas'),
+            antialias: true,
+            alpha: true
+        });
+
+        // Configure renderer
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0x000000, 0);
+
+        console.log('Renderer created:', renderer);
+        console.log('Canvas element:', document.getElementById('canvas'));
+
+        // Create a test cube
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // Add lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
+        scene.add(ambientLight);
+
+        // Position camera
+        camera.position.z = 5;
+
+        console.log('Scene objects:', scene.children.length);
+        console.log('Camera position:', camera.position);
+
+        // Animation variables
+        let isRotating = true;
+        let frameCount = 0;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            frameCount++;
+            if (frameCount % 60 === 0) {
+                console.log('Animation running, frame:', frameCount);
+                document.getElementById('status').textContent = `Running - Frame: ${frameCount}`;
+            }
+            
+            if (isRotating) {
+                cube.rotation.x += 0.01;
+                cube.rotation.y += 0.01;
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        // Event listeners
+        document.getElementById('rotate-btn').addEventListener('click', () => {
+            isRotating = !isRotating;
+            document.getElementById('rotate-btn').textContent = isRotating ? 'Stop Rotation' : 'Start Rotation';
+        });
+
+        document.getElementById('color-btn').addEventListener('click', () => {
+            const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff];
+            const currentColor = material.color.getHex();
+            const currentIndex = colors.indexOf(currentColor);
+            const nextIndex = (currentIndex + 1) % colors.length;
+            material.color.setHex(colors[nextIndex]);
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Start animation
+        console.log('Starting animation...');
+        animate();
+        
+        document.getElementById('status').textContent = 'Three.js scene loaded successfully!';
+    </script>
+</body>
+</html>

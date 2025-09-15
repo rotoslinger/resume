@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:," />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three.js</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="three-canvas"></canvas>
+      <div class="ui-overlay">
+        <header class="header">
+          <h1></h1>
+        </header>
+                    <div class="controls">
+                      <div class="control-group">
+                        <button id="play-audio-btn">🎵 Play Audio</button>
+                      </div>
+                      <div class="control-group">
+                        <label for="volume-slider">Volume:</label>
+                        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5">
+                        <span id="volume-value">0.5</span>
+                      </div>
+          <div class="control-group">
+            <label for="head-rotation">Head Rotation X:</label>
+            <input type="range" id="head-rotation" min="-1.57" max="1.57" step="0.1" value="0">
+            <span id="head-rotation-value">0.0</span>
+          </div>
+          <div class="control-group">
+            <label for="neck-rotation">Neck Rotation X:</label>
+            <input type="range" id="neck-rotation" min="-1.57" max="1.57" step="0.1" value="0">
+            <span id="neck-rotation-value">0.0</span>
+          </div>
+        </div>
+        <!-- Material property controls - Commented out
+        <div class="controls">
+          <div class="control-group">
+            <label for="sheen-weight">Sheen Weight:</label>
+            <input type="range" id="sheen-weight" min="0" max="1" step="0.1" value="0.5">
+            <span id="sheen-weight-value">0.5</span>
+          </div>
+          <div class="control-group">
+            <label for="sheen-roughness">Sheen Roughness:</label>
+            <input type="range" id="sheen-roughness" min="0" max="1" step="0.1" value="0.4">
+            <span id="sheen-roughness-value">0.4</span>
+          </div>
+          <div class="control-group">
+            <label for="sheen-color">Sheen Color:</label>
+            <input type="range" id="sheen-color" min="0" max="1" step="0.1" value="1.0">
+            <span id="sheen-color-value">1.0</span>
+          </div>
+          <div class="control-group">
+            <label for="ior">IOR (Index of Refraction):</label>
+            <input type="range" id="ior" min="1.0" max="2.5" step="0.1" value="1.5">
+            <span id="ior-value">1.5</span>
+          </div>
+          <div class="control-group">
+            <label for="roughness">Roughness:</label>
+            <input type="range" id="roughness" min="0" max="1" step="0.1" value="0.9">
+            <span id="roughness-value">0.9</span>
+          </div>
+        </div>
+        -->
+        <!-- UI Controls - Commented out for clean checkin
+        <div class="controls">
+          <div class="control-group">
+            <label for="ambient-intensity">Ambient Light:</label>
+            <input type="range" id="ambient-intensity" min="0" max="2" step="0.1" value="1.4">
+            <span id="ambient-value">1.4</span>
+          </div>
+          <div class="control-group">
+            <label for="directional-intensity">Directional Light:</label>
+            <input type="range" id="directional-intensity" min="0" max="2" step="0.1" value="1.3">
+            <span id="directional-value">1.3</span>
+          </div>
+          <div class="control-group">
+            <label for="rim-intensity">Rim Light:</label>
+            <input type="range" id="rim-intensity" min="0" max="1" step="0.1" value="0.5">
+            <span id="rim-value">0.5</span>
+          </div>
+          <div class="control-group">
+            <label for="ssao-intensity">SSAO Intensity:</label>
+            <input type="range" id="ssao-intensity" min="0" max="2" step="0.1" value="0.9">
+            <span id="ssao-value">0.9</span>
+          </div>
+          <div class="control-group">
+            <label for="background-brightness">Background Brightness:</label>
+            <input type="range" id="background-brightness" min="0" max="1" step="0.1" value="0.1">
+            <span id="background-value">0.1</span>
+          </div>
+          <div class="control-group">
+            <label for="ground-brightness">Ground Brightness:</label>
+            <input type="range" id="ground-brightness" min="0" max="1" step="0.1" value="0.3">
+            <span id="ground-brightness-value">0.3</span>
+          </div>
+          <div class="control-group">
+            <label for="light-rotation-x">Rim Light Position X:</label>
+            <input type="range" id="light-rotation-x" min="-20" max="20" step="1" value="8">
+            <span id="light-rotation-x-value">8.0</span>
+          </div>
+          <div class="control-group">
+            <label for="light-rotation-y">Rim Light Position Y:</label>
+            <input type="range" id="light-rotation-y" min="-20" max="20" step="1" value="6">
+            <span id="light-rotation-y-value">6.0</span>
+          </div>
+          <div class="control-group">
+            <label for="light-rotation-z">Rim Light Position Z:</label>
+            <input type="range" id="light-rotation-z" min="-20" max="20" step="1" value="-11">
+            <span id="light-rotation-z-value">-11.0</span>
+          </div>
+        </div>
+        -->
+      </div>
+    </div>
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
+
